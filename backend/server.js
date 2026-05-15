@@ -10,12 +10,16 @@ connectDB();
 
 // middleware
 app.use(cors({
-  origin:'*'
+  origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((origin) => origin.trim()) : '*',
 }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // routes
 app.use('/api/tasks', require('./routes/taskRoutes'));
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ success: true, message: 'Backend is healthy' });
+});
 
 app.get('/', (req, res) => {
   res.send('Backend is running');
