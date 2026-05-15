@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -18,12 +19,34 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '1mb' }));
 
+// Rate limiting for API routes
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api', apiLimiter);
+
 // routes
 app.use('/api/tasks', require('./routes/taskRoutes'));
 
 app.get('/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Backend is healthy' });
 });
+
+// Rate limiting for static file serving
+const staticLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300, // Higher limit for static assets
+  skip: (req) => req.path.startsWith('/api'), // Skip API routes
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(staticLimiter);
 
 // Serve static frontend files if they exist (for monorepo deployment)
 const publicPath = path.join(__dirname, '../frontend/dist');
