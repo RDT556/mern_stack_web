@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
+const DEFAULT_PROD_BACKEND = 'https://mern-stack-fpktbnjpg-anujs-projects-15bf00fb.vercel.app/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : DEFAULT_PROD_BACKEND);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
