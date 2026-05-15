@@ -14,9 +14,11 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^7.1.5",
     "mongoose": "^9.1.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
   }
 }
+
