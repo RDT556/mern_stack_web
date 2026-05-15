@@ -6,7 +6,10 @@ const connectDB = require('./config/db');
 const app = express();
 
 // connect to database
-connectDB();
+connectDB().catch((err) => {
+  console.error('Failed to connect to DB on startup:', err.message || err);
+  process.exit(1);
+});
 
 // middleware
 app.use(cors({

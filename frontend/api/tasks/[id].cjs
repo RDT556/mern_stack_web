@@ -7,9 +7,9 @@ module.exports = async (req, res) => {
 
   if (!id) return res.status(400).json({ success: false, error: 'Missing id' });
 
-  await connectDB();
-
   try {
+    await connectDB();
+
     if (method === 'PUT') {
       const task = await Task.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
       if (!task) return res.status(404).json({ success: false, error: 'Task not found' });

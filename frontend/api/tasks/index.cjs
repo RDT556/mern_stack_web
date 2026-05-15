@@ -4,10 +4,10 @@ const Task = require('../../../backend/models/Task');
 module.exports = async (req, res) => {
   const method = req.method;
 
-  // ensure DB connection
-  await connectDB();
-
   try {
+    // ensure DB connection
+    await connectDB();
+
     if (method === 'GET') {
       const tasks = await Task.find().sort({ createdAt: -1 });
       return res.status(200).json({ success: true, count: tasks.length, data: tasks });
