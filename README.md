@@ -1,154 +1,122 @@
-# MERN Task Manager
+# TaskFlow — MERN Task Manager
 
-A full-stack task manager built with the MERN stack. The project is split into a Node.js/Express backend and a React/Vite frontend, with MongoDB used for persistence. Users can create tasks, mark them complete, edit their completion state, and delete them from the list.
+A full-stack task management app built with the **MERN stack** (MongoDB, Express, React, Node.js).
 
-## Features
+---
 
-- Create tasks with a required title and optional description.
-- View all tasks sorted by newest first.
-- Mark tasks as complete or undo completion.
-- Delete tasks from the database.
-- REST API built with Express and MongoDB/Mongoose.
-- React frontend powered by Vite and Axios.
+## ✨ Features
 
-## Tech Stack
+- Create, complete, and delete tasks
+- Persistent storage with MongoDB Atlas
+- Animated Neo-Brutalism UI
+- Fully responsive (mobile-friendly)
+- Deployed on Vercel (frontend + backend)
 
-- Frontend: React, Vite, Axios
-- Backend: Node.js, Express, Mongoose, CORS, dotenv
-- Database: MongoDB
+---
 
-## Project Structure
+## 🏗️ Project Structure
 
 ```
-mern_stack_web/
-├── backend/
-│   ├── config/
-│   │   └── db.js
-│   ├── controllers/
-│   │   └── taskController.js
-│   ├── models/
-│   │   └── Task.js
-│   ├── routes/
-│   │   └── taskRoutes.js
-│   └── server.js
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── TaskForm.jsx
-│   │   │   └── TaskItem.jsx
-│   │   ├── services/
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   ├── index.css
-│   │   └── main.jsx
-│   └── vite.config.js
-└── README.md
+task_mern-main/
+├── backend/          # Express REST API
+│   ├── config/       # MongoDB connection
+│   ├── controllers/  # Route logic
+│   ├── models/       # Mongoose schemas
+│   ├── routes/       # API routes
+│   ├── server.js     # Entry point
+│   ├── .env.example  # ← copy to .env and fill in values
+│   └── vercel.json   # Vercel serverless config
+└── frontend/         # React + Vite app
+    ├── src/
+    │   ├── components/
+    │   ├── services/  # Axios API client
+    │   ├── App.jsx
+    │   └── index.css
+    ├── .env.example   # ← copy to .env.local and fill in values
+    └── vercel.json    # Vercel SPA config
 ```
 
-## Prerequisites
+---
 
-- Node.js 18 or newer
-- npm
-- A MongoDB database or MongoDB Atlas connection string
+## 🚀 Local Development
 
-## Environment Variables
+### 1. Clone the repo
 
-Create a `.env` file inside `backend/` with:
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-PORT=5000
+```bash
+git clone <your-repo-url>
+cd task_mern-main
 ```
 
-Optional frontend environment variable:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-For production deployments, set `VITE_API_URL` to the public backend URL and set `CLIENT_URL` in the backend to your deployed frontend URL. If `CLIENT_URL` contains multiple comma-separated origins, the backend will allow them all.
-
-## Installation
-
-Install dependencies separately for the backend and frontend:
+### 2. Backend setup
 
 ```bash
 cd backend
+cp .env.example .env          # Fill in MONGODB_URI and ALLOWED_ORIGIN
 npm install
-
-cd ../frontend
-npm install
+npm run dev                   # Starts on http://localhost:5000
 ```
 
-## Running the App
-
-Start the backend in one terminal:
-
-```bash
-cd backend
-npm run dev
-```
-
-Start the frontend in another terminal:
+### 3. Frontend setup
 
 ```bash
 cd frontend
-npm run dev
+cp .env.example .env.local    # Set VITE_API_URL=http://localhost:5000/api
+npm install
+npm run dev                   # Starts on http://localhost:5173
 ```
 
-The backend runs on `http://localhost:5000` by default, and the Vite frontend runs on the local port shown in the terminal output.
+---
 
-## Available Scripts
+## ☁️ Deployment on Vercel
 
-### Backend
+Both the frontend and backend are deployed as **separate Vercel projects**.
 
-- `npm start` - Start the Express server in production mode.
-- `npm run dev` - Start the server with nodemon for development.
+### Step 1 — Deploy the Backend
 
-### Frontend
+1. Push your code to GitHub (make sure `.env` is in `.gitignore` ✅)
+2. Go to [vercel.com](https://vercel.com) → **New Project**
+3. Import the repo, set **Root Directory** to `backend`
+4. Add the following **Environment Variables** in Vercel:
 
-- `npm run dev` - Start the Vite development server.
-- `npm run build` - Build the frontend for production.
-- `npm run lint` - Run ESLint across the frontend source files.
-- `npm run preview` - Preview the production build locally.
+   | Variable | Value |
+   |---|---|
+   | `MONGODB_URI` | Your MongoDB Atlas connection string |
+   | `NODE_ENV` | `production` |
+   | `ALLOWED_ORIGIN` | `https://your-frontend-name.vercel.app` (add after step 2) |
 
-## API Endpoints
+5. Deploy → copy the backend URL (e.g. `https://your-backend.vercel.app`)
 
-Base URL: `/api/tasks`
+### Step 2 — Deploy the Frontend
 
-- `GET /api/tasks` - Fetch all tasks.
-- `POST /api/tasks` - Create a new task.
-- `PUT /api/tasks/:id` - Update an existing task, including completion state.
-- `DELETE /api/tasks/:id` - Delete a task.
+1. Go to [vercel.com](https://vercel.com) → **New Project**
+2. Import the same repo, set **Root Directory** to `frontend`
+3. Add the following **Environment Variables** in Vercel:
 
-### Task Shape
+   | Variable | Value |
+   |---|---|
+   | `VITE_API_URL` | `https://your-backend.vercel.app/api` |
 
-The MongoDB task document uses these fields:
+4. Deploy
 
-- `title` - required string
-- `description` - optional string
-- `completed` - boolean, defaults to `false`
-- `createdAt` and `updatedAt` - added automatically by timestamps
+### Step 3 — Update CORS
 
-## How It Works
+Go back to the **backend** project on Vercel → **Settings → Environment Variables** → update `ALLOWED_ORIGIN` to your frontend URL → **Redeploy**.
 
-- The backend connects to MongoDB through `backend/config/db.js`.
-- Express exposes the task routes from `backend/routes/taskRoutes.js`.
-- The frontend loads tasks on page start, then uses Axios requests in `frontend/src/services/api.js` to create, update, and delete tasks.
-- `TaskForm` handles task creation, and `TaskItem` handles completion toggling and deletion.
+---
 
-## Notes
+## 📡 API Reference
 
-- Make sure MongoDB is reachable before starting the backend.
-- If you change the backend URL, update `VITE_API_URL` accordingly.
-- The backend exposes a `/health` endpoint for deployment checks.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/api/tasks` | Get all tasks |
+| `POST` | `/api/tasks` | Create a task |
+| `PUT`  | `/api/tasks/:id` | Update a task |
+| `DELETE` | `/api/tasks/:id` | Delete a task |
 
-## Deployment
+---
 
-This repo is set up best as two deployments:
+## 🔒 Security Notes
 
-1. Deploy the backend as a Node.js service with `MONGODB_URI`, `PORT`, and optionally `CLIENT_URL` set in the host environment.
-2. Deploy the frontend as a static Vite app with `VITE_API_URL` pointing to the backend service.
-
-Before deploying, run `npm run build` inside `frontend/` and confirm the backend can connect to MongoDB with the production connection string.
+- **Never commit `.env`** — it's in `.gitignore`. Use `.env.example` as a reference.
+- In production, `ALLOWED_ORIGIN` restricts CORS to your frontend domain only.
+- Error messages in production do **not** expose stack traces.
