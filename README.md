@@ -67,40 +67,9 @@ npm run dev                   # Starts on http://localhost:5173
 
 ---
 
-## ☁️ Deployment on Vercel
+## 🧩 Project Description
 
-Both the frontend and backend are deployed as **separate Vercel projects**.
-
-### Step 1 — Deploy the Backend
-
-1. Push your code to GitHub (make sure `.env` is in `.gitignore` ✅)
-2. Go to [vercel.com](https://vercel.com) → **New Project**
-3. Import the repo, set **Root Directory** to `backend`
-4. Add the following **Environment Variables** in Vercel:
-
-   | Variable | Value |
-   |---|---|
-   | `MONGODB_URI` | Your MongoDB Atlas connection string |
-   | `NODE_ENV` | `production` |
-   | `ALLOWED_ORIGIN` | `https://your-frontend-name.vercel.app` (add after step 2) |
-
-5. Deploy → copy the backend URL (e.g. `https://your-backend.vercel.app`)
-
-### Step 2 — Deploy the Frontend
-
-1. Go to [vercel.com](https://vercel.com) → **New Project**
-2. Import the same repo, set **Root Directory** to `frontend`
-3. Add the following **Environment Variables** in Vercel:
-
-   | Variable | Value |
-   |---|---|
-   | `VITE_API_URL` | `https://your-backend.vercel.app/api` |
-
-4. Deploy
-
-### Step 3 — Update CORS
-
-Go back to the **backend** project on Vercel → **Settings → Environment Variables** → update `ALLOWED_ORIGIN` to your frontend URL → **Redeploy**.
+TaskFlow is a lightweight task management system that separates concerns between a RESTful backend and a reactive frontend. The backend exposes a simple CRUD API for tasks and persists data in MongoDB, while the frontend provides a fast, responsive UI built with React and Vite. The API client layer in the frontend centralizes HTTP calls, and the backend follows a clean controller → model → route structure to keep logic organized and easy to extend.
 
 ---
 
