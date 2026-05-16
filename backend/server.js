@@ -1,73 +1,100 @@
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
 const app = express();
 
-// Connect to database
+// ─────────────────────────────────────────────────────────────
+// Connect MongoDB
+// ─────────────────────────────────────────────────────────────
 connectDB();
 
-// ─── CORS ────────────────────────────────────────────────────────────────────
-// In production, restrict to the frontend origin(s) set via ALLOWED_ORIGIN env var.
-// In development, allow all origins for convenience.
+// ─────────────────────────────────────────────────────────────
+// Middleware
+// ─────────────────────────────────────────────────────────────
+
+// Parse JSON requests
+app.use(express.json());
+
+// CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGIN
-  ? process.env.ALLOWED_ORIGIN.split(',').map((o) => o.trim())
+  ? process.env.ALLOWED_ORIGIN.split(',').map((origin) => origin.trim())
   : [];
 
 app.use(
   cors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? (origin, callback) => {
-            // Allow requests with no origin (e.g. curl, Postman, server-to-server)
+        ? function (origin, callback) {
+            // Allow Postman / server-side requests
             if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) return callback(null, true);
-            callback(new Error(`CORS: origin ${origin} not allowed`));
+
+            if (allowedOrigins.includes(origin)) {
+              return callback(null, true);
+            }
+
+            return callback(
+              new Error(`CORS Error: ${origin} is not allowed`)
+            );
           }
         : '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   })
 );
 
-// ─── Body Parser ─────────────────────────────────────────────────────────────
-app.use(express.json());
-
-// ─── Routes ──────────────────────────────────────────────────────────────────
-app.use('/api/tasks', require('./routes/taskRoutes'));
+// ─────────────────────────────────────────────────────────────
+// Routes
+// ─────────────────────────────────────────────────────────────
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend is running ✅', status: 'ok' });
+  res.json({
+    success: true,
+    message: 'TaskFlow Backend Running 🚀',
+  });
 });
 
-// ─── 404 Handler ─────────────────────────────────────────────────────────────
+// Task Routes
+app.use('/api/tasks', require('./routes/taskRoutes'));
+
+// ─────────────────────────────────────────────────────────────
+// 404 Handler
+// ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
-  res.status(404).json({ success: false, error: 'Route not found' });
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+  });
 });
 
-// ─── Global Error Handler ────────────────────────────────────────────────────
-// Must have 4 args so Express recognises it as an error handler
-// eslint-disable-next-line no-unused-vars
+// ─────────────────────────────────────────────────────────────
+// Global Error Handler
+// ─────────────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err.stack || err.message);
+  console.error(err.stack);
+
   res.status(err.status || 500).json({
     success: false,
-    // Don't leak stack traces in production
-    error:
+    message:
       process.env.NODE_ENV === 'production'
         ? 'Internal Server Error'
         : err.message,
   });
 });
 
-// ─── Server Start ─────────────────────────────────────────────────────────────
-// Also listen locally (works for Render, Railway, etc.)
-// Vercel ignores this and uses the module.exports below instead.
+// ─────────────────────────────────────────────────────────────
+// Start Server
+// ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} [${process.env.NODE_ENV}]`);
+  console.log(
+    `Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`
+  );
 });
 
-// Required for Vercel serverless deployment
+// Export for serverless platforms if needed
 module.exports = app;
